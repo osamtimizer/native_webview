@@ -26,11 +26,20 @@ class NativeWebView(channel: MethodChannel, context: Context) : InputAwareWebVie
         }
 
         initialFile?.let { path ->
-            val filename = Locator.binding!!.flutterAssets.getAssetFilePathByName(path)
+            val filename = getAssetFilePathByName(path)
             loadUrl("file:///android_asset/${filename}", initialHeaders)
             return
         }
 
         loadUrl(initialURL, initialHeaders)
+    }
+
+    private fun getAssetFilePathByName(path: String): String {
+        val registrar = Locator.registrar
+        if (registrar != null) {
+            return registrar.lookupKeyForAsset(path)
+        }
+
+        return Locator.binding!!.flutterAssets.getAssetFilePathByName(path)
     }
 }

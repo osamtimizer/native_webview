@@ -6,9 +6,23 @@ import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.platform.PlatformViewRegistry
+import io.flutter.plugin.common.PluginRegistry
 
 class NativeWebviewPlugin : FlutterPlugin, ActivityAware {
     private var cookieManager: MyCookieManager? = null
+
+    companion object {
+        public fun registerWith(registrar: PluginRegistry.Registrar) {
+            Locator.activity = registrar.activity()
+            Locator.registrar = registrar // v1
+
+            val instance = NativeWebviewPlugin()
+            instance.onAttachedToEngine(
+                registrar.messenger(),
+                registrar.platformViewRegistry()
+            )
+        }
+    }
 
     override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         Locator.binding = binding
@@ -23,7 +37,7 @@ class NativeWebviewPlugin : FlutterPlugin, ActivityAware {
         Locator.binding = null
     }
 
-    private fun onAttachedToEngine(messenger: BinaryMessenger, registry: PlatformViewRegistry) {
+    fun onAttachedToEngine(messenger: BinaryMessenger, registry: PlatformViewRegistry) {
         registry.registerViewFactory(
             "com.hisaichi5518/native_webview",
             FlutterWebViewFactory(messenger)
