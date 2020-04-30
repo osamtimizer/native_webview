@@ -24,7 +24,8 @@ class PresentationContext(
         }
 
     override fun getSystemService(name: String): Any? {
-        return if (isCalledFromAlertDialog) {
+        return if (isCalledFromAlertDialog || name == "autofil") {
+            // refs https://github.com/hisaichi5518/native_webview/issues/31
             // Alert dialogs are showing on top of the entire application and should not be limited to
             // the virtual
             // display. If we detect that an android.app.AlertDialog constructor is what's fetching

@@ -35,7 +35,6 @@ class FlutterWebViewController(
 
         methodChannel.setMethodCallHandler(this)
 
-        // refs https://github.com/hisaichi5518/native_webview/issues/31
         webview = NativeWebView(PresentationContext(context, Locator.activity!!), methodChannel, options)
         webview.load(initialData, initialFile, initialUrl, initialHeaders)
     }
