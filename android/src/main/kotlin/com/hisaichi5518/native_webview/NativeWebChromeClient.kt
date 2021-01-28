@@ -2,9 +2,16 @@ package com.hisaichi5518.native_webview
 
 import android.content.DialogInterface
 import android.util.Log
+import android.net.Uri
+import android.provider.MediaStore
+import android.os.Parcelable
 import android.webkit.JsPromptResult
+import android.content.Intent
+import android.app.Activity
 import android.webkit.JsResult
+import android.webkit.MimeTypeMap
 import android.webkit.WebChromeClient
+import android.webkit.ValueCallback
 import android.webkit.WebView
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -14,6 +21,15 @@ import io.flutter.plugin.common.MethodChannel
 
 
 class NativeWebChromeClient(private val channel: MethodChannel) : WebChromeClient() {
+    private val PICKER = 1
+    val DEFAULT_MIME_TYPES = "image/*"
+    override fun onShowFileChooser(webView: WebView?, filePathCallback: ValueCallback<Array<Uri>>? , fileChooserParams: FileChooserParams?): Boolean {
+        val acceptTypes: Array<String?> = fileChooserParams!!.getAcceptTypes()
+        val allowMultiple = fileChooserParams!!.getMode() === WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE
+        val intent: Intent = fileChooserParams!!.createIntent()
+        return startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple)
+    }
+
     override fun onProgressChanged(view: WebView?, newProgress: Int) {
         super.onProgressChanged(view, newProgress)
         channel.invokeMethod("onProgressChanged", mapOf(
@@ -163,6 +179,19 @@ class NativeWebChromeClient(private val channel: MethodChannel) : WebChromeClien
                     )
                 }
             })
+        return true
+    }
+
+    fun startPhotoPickerIntent(callback: ValueCallback<Array<Uri>>?, intent: Intent?, acceptTypes: Array<String?>?, allowMultiple: Boolean): Boolean {
+        val activity: Activity = Locator.activity!!
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.setType("image/*")
+        if (intent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivityForResult(intent, PICKER)
+        } else {
+            // do nothing
+        }
         return true
     }
 

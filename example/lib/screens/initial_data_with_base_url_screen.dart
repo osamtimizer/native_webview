@@ -19,6 +19,9 @@ class InitialDataWithBaseUrlScreen extends StatelessWidget {
 </head>
 <body>
   base url is <div></div>
+  <input type="file"
+       id="avatar" name="avatar"
+       accept="image/png, image/jpeg">
   <script>
   document.querySelector("div").textContent = location.href;
   </script>
